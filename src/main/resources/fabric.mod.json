@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "platos",
+  "version": "${version}",
+
+  "name": "Plato's Transporters",
+  "description": "A spiritual successor to Archemides Ships/ Da Vincis vessels for 1.16",
+  "authors": [
+    "Acro"
+  ],
+  "contact": {
+    "homepage": "http://acro.rf.gd/",
+    "sources": "https://github.com/JSJBDEV/PlatosTransporters"
+  },
+
+  "license": "MIT",
+  "icon": "assets/platos/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "gd.rf.acro.platos.PlatosTransporters"
+    ],
+    "client": [{
+      "value": "gd.rf.acro.platos.ClientInit"
+    }]
+  },
+  "mixins": [
+    "modid.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}

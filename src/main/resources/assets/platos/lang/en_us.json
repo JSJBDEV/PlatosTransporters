@@ -1,0 +1,13 @@
+{
+  "item.platos.control_key": "Control Key",
+  "item.platos.wrench": "Disassembly Wrench",
+  "item.platos.lift_jack": "Ship Lift Jack",
+  "item.platos.clearing_scythe": "Clearing Scythe",
+
+  "block.platos.ship_controller": "Ship Controller Assembly",
+  "block.platos.wheel_block": "Wheel",
+  "block.platos.float_block": "Water Float",
+  "block.platos.balloon_block": "Airship Balloon",
+
+  "itemGroup.platos.tab": "Plato's Transporters"
+}
