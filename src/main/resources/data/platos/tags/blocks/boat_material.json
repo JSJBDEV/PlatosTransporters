@@ -11,17 +11,9 @@
     "platos:wheel_block",
     "platos:float_block",
     "platos:balloon_block",
-    "minecraft:stripped_birch_log",
-    "minecraft:stripped_birch_wood",
-    "minecraft:stripped_oak_log",
-    "minecraft:stripped_oak_wood",
-    "minecraft:stripped_jungle_log",
-    "minecraft:stripped_jungle_wood",
-    "minecraft:stripped_acacia_log",
-    "minecraft:stripped_acacia_wood",
-    "minecraft:stripped_dark_oak_log",
-    "minecraft:stripped_dark_oak_wood",
-    "minecraft:stripped_spruce_log",
-    "minecraft:stripped_spruce_wood"
+    "#minecraft:logs",
+    "#minecraft:buttons",
+    "#minecraft:carpets",
+    "minecraft:glass"
   ]
 }

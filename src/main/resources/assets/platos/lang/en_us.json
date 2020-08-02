@@ -9,5 +9,9 @@
   "block.platos.float_block": "Water Float",
   "block.platos.balloon_block": "Airship Balloon",
 
+  "scythe.platos.tooltip": "use this item to clear away grass!",
+  "liftjack.platos.tooltip":"The player will be sitting on the block",
+  "liftjack.platos.tooltip2": "above ground/water level",
+
   "itemGroup.platos.tab": "Plato's Transporters"
 }

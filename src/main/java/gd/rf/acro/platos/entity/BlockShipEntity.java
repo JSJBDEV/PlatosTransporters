@@ -1,5 +1,6 @@
 package gd.rf.acro.platos.entity;
 
+import gd.rf.acro.platos.ConfigUtils;
 import gd.rf.acro.platos.PlatosTransporters;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -25,9 +26,7 @@ import net.minecraft.tag.FluidTags;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -50,8 +49,12 @@ public class BlockShipEntity extends PigEntity {
         return false;
     }
 
+
     @Override
     public float getSaddledSpeed() {
+
+        float cspeed = Float.parseFloat(ConfigUtils.config.getOrDefault("cspeed","0.2"));
+        float nspeed = Float.parseFloat(ConfigUtils.config.getOrDefault("nspeed","0.05"));
         if(this.getPrimaryPassenger() instanceof  PlayerEntity)
         {
             if(((PlayerEntity) this.getPrimaryPassenger()).getMainHandStack().getItem()== PlatosTransporters.CONTROL_KEY_ITEM)
@@ -62,9 +65,9 @@ public class BlockShipEntity extends PigEntity {
                     {
                         if(this.world.getBlockState(this.getBlockPos().down()).getBlock()== Blocks.WATER)
                         {
-                            return 0.2f;
+                            return cspeed;
                         }
-                        return 0.05f;
+                        return nspeed;
                     }
                     if(this.getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==1)
                     {
@@ -72,7 +75,7 @@ public class BlockShipEntity extends PigEntity {
                     }
                     else
                     {
-                        return 0.2f;
+                        return cspeed;
                     }
                 }
             }
@@ -122,6 +125,11 @@ public class BlockShipEntity extends PigEntity {
         this.equipStack(EquipmentSlot.CHEST,itemStack);
     }
 
+    @Override
+    public int getSafeFallDistance() {
+        return 400;
+    }
+
     public void tryDisassemble()
     {
         if(this.getEquippedStack(EquipmentSlot.CHEST).getItem()==Items.OAK_PLANKS)
@@ -132,7 +140,7 @@ public class BlockShipEntity extends PigEntity {
             for (Tag tag : list)
             {
                 String[] split = tag.asString().split(" ");
-                if (world.getBlockState(this.getBlockPos().add(Integer.parseInt(split[1]), Integer.parseInt(split[2]) + offset, Integer.parseInt(split[3]))).getBlock() != Blocks.AIR) {
+                if (!world.getBlockState(this.getBlockPos().add(Integer.parseInt(split[1]), Integer.parseInt(split[2]) + offset, Integer.parseInt(split[3]))).isAir()) {
                     if (this.getPrimaryPassenger() instanceof PlayerEntity) {
                         ((PlayerEntity) this.getPrimaryPassenger()).sendMessage(new LiteralText("cannot disassemble, not enough space"), false);
                     }
@@ -162,6 +170,43 @@ public class BlockShipEntity extends PigEntity {
             this.removeAllPassengers();
             this.teleport(0,-1000,0);
         }
+    }
+
+    private Integer[] shouldRotateStructure(int i, int j, int k)
+    {
+        if(!world.isClient){
+            int direction = this.getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("direction");
+            int curDir = getClosestAxis();
+            if(direction==curDir)
+            {
+                return new Integer[]{i,j,k};
+            }
+            if(direction+90==curDir)
+            {
+                return new Integer[]{k,j,i};
+            }
+            if(direction+180==curDir)
+            {
+                return new Integer[]{i,j,k};
+            }
+        }
+        return new Integer[]{0,0,0};
+    }
+    private int getClosestAxis()
+    {
+        if(this.yaw>135 && this.yaw<225)
+        {
+            return 180;
+        }
+        if(this.yaw>225 && this.yaw<315)
+        {
+            return 270;
+        }
+        if(this.yaw>45 && this.yaw<135)
+        {
+            return 90;
+        }
+        return 0;
     }
 
     @Override
@@ -200,8 +245,14 @@ public class BlockShipEntity extends PigEntity {
     }
 
     @Override
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
+        return false;
+    }
+
+    @Override
     public void updatePassengerPosition(Entity passenger) {
         int extra = 0;
+        passenger.fallDistance=0;
         if(this.getEquippedStack(EquipmentSlot.CHEST).getItem()==Items.OAK_PLANKS)
         {
             extra = this.getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("offset")-1;

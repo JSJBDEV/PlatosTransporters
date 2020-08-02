@@ -1,0 +1,13 @@
+{
+  "item.platos.control_key": "Ключ Контороля",
+  "item.platos.wrench": "Ключ для Разборки Судна",
+  "item.platos.lift_jack": "Домкрат",
+  "item.platos.clearing_scythe": "Коса",
+
+  "block.platos.ship_controller": "Контролер Судна",
+  "block.platos.wheel_block": "Колесо",
+  "block.platos.float_block": "Двигатель корабля",
+  "block.platos.balloon_block": "Воздушный Шар Дирижабля",
+
+  "itemGroup.platos.tab": "Plato's Transporters"
+}
