@@ -9,6 +9,9 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
@@ -22,10 +25,18 @@ public class ControlKeyItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if(user.getVehicle() instanceof BlockShipEntity)
         {
-            if(((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==1)
+            CompoundTag tag =((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getTag();
+            if(tag.getInt("type")==1)
             {
                 user.getVehicle().setVelocity(user.getRotationVector().x,user.getRotationVector().y,user.getRotationVector().z);
-                ((BlockShipEntity) user.getVehicle()).addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING,9999,2,true,false));
+                if(((ListTag)tag.get("addons")).contains(StringTag.of("altitude")))
+                {
+                    user.getVehicle().setNoGravity(true);
+                }
+                else
+                {
+                    ((BlockShipEntity) user.getVehicle()).addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 9999, 2, true, false));
+                }
             }
         }
         PlatosTransporters.givePlayerStartBook(user);

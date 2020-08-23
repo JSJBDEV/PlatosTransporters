@@ -3,10 +3,7 @@ package gd.rf.acro.platos;
 import gd.rf.acro.platos.blocks.BlockControlWheel;
 import gd.rf.acro.platos.blocks.NotFullBlock;
 import gd.rf.acro.platos.entity.BlockShipEntity;
-import gd.rf.acro.platos.items.ClearingScytheItem;
-import gd.rf.acro.platos.items.ControlKeyItem;
-import gd.rf.acro.platos.items.LiftJackItem;
-import gd.rf.acro.platos.items.WrenchItem;
+import gd.rf.acro.platos.items.*;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
@@ -16,6 +13,7 @@ import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -27,6 +25,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.tag.Tag;
+import net.minecraft.text.StringVisitable;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -71,6 +71,7 @@ public class PlatosTransporters implements ModInitializer {
 	public static final LiftJackItem LIFT_JACK_ITEM = new LiftJackItem(new Item.Settings().group(PlatosTransporters.TAB));
 	public static final WrenchItem WRENCH_ITEM = new WrenchItem(new Item.Settings().group(PlatosTransporters.TAB));
 	public static final ClearingScytheItem CLEARING_SCYTHE_ITEM = new ClearingScytheItem(new Item.Settings().group(PlatosTransporters.TAB).maxDamage(100));
+	public static final BoardingStairsItem BOARDING_STAIRS_ITEM = new BoardingStairsItem(new Item.Settings().group(PlatosTransporters.TAB));
 	private void registerItems()
 	{
 		Registry.register(Registry.ITEM, new Identifier("platos", "ship_controller"), new BlockItem(BLOCK_CONTROL_WHEEL, new Item.Settings().group(PlatosTransporters.TAB)));
@@ -81,21 +82,23 @@ public class PlatosTransporters implements ModInitializer {
 		Registry.register(Registry.ITEM,new Identifier("platos","lift_jack"),LIFT_JACK_ITEM);
 		Registry.register(Registry.ITEM,new Identifier("platos","wrench"),WRENCH_ITEM);
 		Registry.register(Registry.ITEM,new Identifier("platos","clearing_scythe"),CLEARING_SCYTHE_ITEM);
+		Registry.register(Registry.ITEM,new Identifier("platos","boarding_stairs"),BOARDING_STAIRS_ITEM);
 	}
 
 	public static void givePlayerStartBook(PlayerEntity playerEntity)
 	{
 		if(!playerEntity.getScoreboardTags().contains("platos_new"))
 		{
+
 			playerEntity.giveItemStack(createBook("Acro","Plato's Transporters"
-					,"Welcome to platos transporters, this mod is in early release so there could be §lbugs"
-					, "§lGetting Started§r \n\nTo get started you first need to craft a §oShip Controller§r and a §oControl Key§r you may also want to craft a §oShip Lift Jack§r. To create a vehicle, it requires the correct amount of floats, balloons or wheel for it's desired terrain"
-					,"1 Water Float = 20 blocks \n\n1 Wheel = 10 blocks \n\n1 airship Balloon = 2 blocks \n\n(these are all configurable) assembly your ship out of valid boat materials and then place the controller"
-					,"The controller will tell you if there is any mistakes or it will create your vehicle. By default the block the player sits on (in front of the controller) will be 1 block above the ground, to change this, use the lift jack"
-					,"the lift jack can raise and lower where the player sits by using or shift-using it (on a block) respectively, to change the height (listed on the jack's tooltip) you can interact with the controller block with the jack in your main hand"
-					,"Once the vehicle is created there is a few controls, to make the water and land variants go forward, one must simply hold the control key, whereas the airship will travel in the direction the player is looking when the key is being used"
-					,"To disassemble the vehicle you must sit on it and then use the Disassembly wrench, it will turn back into blocks IN THE DIRECTION IT WAS BUILT IN if there is space"
-			));
+					,I18n.translate("book.platos.page1")
+					,I18n.translate("book.platos.page2")
+					,I18n.translate("book.platos.page3")
+					,I18n.translate("book.platos.page4")
+					,I18n.translate("book.platos.page5")
+					,I18n.translate("book.platos.page6")
+					,I18n.translate("book.platos.page7")
+					));
 			playerEntity.addScoreboardTag("platos_new");
 		}
 	}

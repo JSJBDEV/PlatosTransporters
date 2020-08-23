@@ -1,0 +1,13 @@
+{
+  "item.platos.control_key": "控制钥匙",
+  "item.platos.wrench": "拆卸扳手",
+  "item.platos.lift_jack": "船舶起重器",
+  "item.platos.clearing_scythe": "除草镰刀",
+
+  "block.platos.ship_controller": "船舶控制器总成",
+  "block.platos.wheel_block": "车轮",
+  "block.platos.float_block": "浮筒",
+  "block.platos.balloon_block": "气囊",
+
+  "itemGroup.platos.tab": "Plato's Transporters"
+}

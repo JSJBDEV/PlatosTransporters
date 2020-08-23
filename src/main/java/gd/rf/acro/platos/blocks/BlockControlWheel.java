@@ -56,6 +56,7 @@ public class BlockControlWheel extends HorizontalFacingBlock {
             int balances = 0;
             HashMap<String,Integer> used = new HashMap<>();
             ListTag list = new ListTag();
+            ListTag addons = new ListTag();
             CompoundTag storage = new CompoundTag();
 
             List<Integer[]> filtered = new ArrayList<>();
@@ -85,41 +86,59 @@ public class BlockControlWheel extends HorizontalFacingBlock {
                                     {
                                         //System.out.println("centre block skipping");
                                     }
-                                    else if(filtered.stream().anyMatch(inside-> Arrays.equals(inside,passable)))
-                                    {
+                                    else {
+                                        boolean b = false;
+                                        for (Integer[] integers : filtered) {
+                                            if (Arrays.equals(integers, passable)) {
+                                                b = true;
+                                                break;
+                                            }
+                                        }
+                                        if(b)
+                                        {
 
-                                        //System.out.println("already added, skipping");
-                                    }
-                                    else if(accepted.stream().anyMatch(inside-> Arrays.equals(inside,passable)))
-                                    {
-                                        //System.out.println("already accepted, skipping");
-                                    }
-                                    else
-                                    {
-                                        filtered.add(passable);
-                                        if(passable[0]>mposx)
-                                        {
-                                            mposx=passable[0];
+                                            //System.out.println("already added, skipping");
                                         }
-                                        if(passable[0]<nposx)
-                                        {
-                                            nposx=passable[0];
-                                        }
-                                        if(passable[1]>mposy)
-                                        {
-                                            mposy=passable[1];
-                                        }
-                                        if(passable[1]<nposy)
-                                        {
-                                            nposy=passable[1];
-                                        }
-                                        if(passable[2]>mposz)
-                                        {
-                                            mposz=passable[2];
-                                        }
-                                        if(passable[2]<nposz)
-                                        {
-                                            nposz=passable[2];
+                                        else {
+                                            boolean result = false;
+                                            for (Integer[] inside : accepted) {
+                                                if (Arrays.equals(inside, passable)) {
+                                                    result = true;
+                                                    break;
+                                                }
+                                            }
+                                            if(result)
+                                            {
+                                                //System.out.println("already accepted, skipping");
+                                            }
+                                            else
+                                            {
+                                                filtered.add(passable);
+                                                if(passable[0]>mposx)
+                                                {
+                                                    mposx=passable[0];
+                                                }
+                                                if(passable[0]<nposx)
+                                                {
+                                                    nposx=passable[0];
+                                                }
+                                                if(passable[1]>mposy)
+                                                {
+                                                    mposy=passable[1];
+                                                }
+                                                if(passable[1]<nposy)
+                                                {
+                                                    nposy=passable[1];
+                                                }
+                                                if(passable[2]>mposz)
+                                                {
+                                                    mposz=passable[2];
+                                                }
+                                                if(passable[2]<nposz)
+                                                {
+                                                    nposz=passable[2];
+                                                }
+                                            }
                                         }
                                     }
 
@@ -139,6 +158,15 @@ public class BlockControlWheel extends HorizontalFacingBlock {
                     list.add(StringTag.of(
                             Block.getRawIdFromState(world.getBlockState(pos.add(i, j, k))) + " " + i + " " + j + " " + k));
                     blocks++;
+
+                    if(world.getBlockState(pos.add(i, j, k)).getBlock()==Blocks.BLAST_FURNACE)
+                    {
+                        addons.add(StringTag.of("engine"));
+                    }
+                    if(world.getBlockState(pos.add(i, j, k)).getBlock()==Blocks.REDSTONE_LAMP)
+                    {
+                        addons.add(StringTag.of("altitude"));
+                    }
 
                     if (world.getBlockEntity(pos.add(i, j, k)) != null) {
                         CompoundTag data = world.getBlockEntity(pos.add(i, j, k)).toTag(new CompoundTag());
@@ -172,11 +200,18 @@ public class BlockControlWheel extends HorizontalFacingBlock {
             if(balances<blocks)
             {
                 player.sendMessage(new LiteralText("Cannot assemble, not enough floats/balloons/wheels"),false);
-                used.keySet().forEach(key->
+                if(type==0)
                 {
-                    player.sendMessage(new LiteralText(key+": "+used.get(key)),false);
-                });
-                player.sendMessage(new LiteralText("If you believe any of the above blocks was added in error report it on CurseForge!"),false);
+                    player.sendMessage(new LiteralText("Requires "+blocks/floats+" floats, you have "+balances/floats),false);
+                }
+                if(type==1)
+                {
+                    player.sendMessage(new LiteralText("Requires "+blocks/balloons+" balloons, you have "+balances/balloons),false);
+                }
+                if(type==2)
+                {
+                    player.sendMessage(new LiteralText("Requires "+blocks/wheels+" wheels, you have"+balances/wheels),false);
+                }
                 return ActionResult.FAIL;
             }
             list.forEach(block->
@@ -199,7 +234,7 @@ public class BlockControlWheel extends HorizontalFacingBlock {
                 }
             }
             entity.setBoundingBox(new Box(nposx,nposy,nposz,mposx,nposy,nposz));
-            entity.setModel(list,getDirection(state),offset,type,storage);
+            entity.setModel(list,getDirection(state),offset,type,storage,addons);
             entity.teleport(player.getX(), player.getY(), player.getZ());
             world.spawnEntity(entity);
             player.startRiding(entity, true);

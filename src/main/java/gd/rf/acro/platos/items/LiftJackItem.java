@@ -45,7 +45,7 @@ public class LiftJackItem extends Item {
             {
                 tag=user.getStackInHand(hand).getTag();
             }
-            if(user.isSneaking())
+            if(user.isSneaking() && tag.getInt("off")>1)
             {
                 tag.putInt("off",tag.getInt("off")-1);
 

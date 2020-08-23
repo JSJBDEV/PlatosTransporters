@@ -3,6 +3,7 @@ package gd.rf.acro.platos.entity;
 import gd.rf.acro.platos.ConfigUtils;
 import gd.rf.acro.platos.PlatosTransporters;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.util.math.Vector3f;
@@ -65,6 +66,11 @@ public class BlockShipEntity extends PigEntity {
                     {
                         if(this.world.getBlockState(this.getBlockPos().down()).getBlock()== Blocks.WATER)
                         {
+                            ListTag go = (ListTag) this.getEquippedStack(EquipmentSlot.CHEST).getTag().get("addons");
+                            if(go.contains(StringTag.of("engine")))
+                            {
+                                return cspeed*1.5f;
+                            }
                             return cspeed;
                         }
                         return nspeed;
@@ -75,6 +81,11 @@ public class BlockShipEntity extends PigEntity {
                     }
                     else
                     {
+                        ListTag go = (ListTag) this.getEquippedStack(EquipmentSlot.CHEST).getTag().get("addons");
+                        if(go.contains(StringTag.of("engine")))
+                        {
+                            return cspeed*1.5f;
+                        }
                         return cspeed;
                     }
                 }
@@ -107,11 +118,26 @@ public class BlockShipEntity extends PigEntity {
     }
 
     @Override
+    protected SoundEvent getFallSound(int distance) {
+        return SoundEvents.ENTITY_BOAT_PADDLE_WATER;
+    }
+
+    @Override
+    protected SoundEvent getSplashSound() {
+        return SoundEvents.ENTITY_BOAT_PADDLE_WATER;
+    }
+
+    @Override
+    protected SoundEvent getSwimSound() {
+        return SoundEvents.ENTITY_BOAT_PADDLE_WATER;
+    }
+
+    @Override
     protected int computeFallDamage(float fallDistance, float damageMultiplier) {
         return 0;
     }
 
-    public void setModel(ListTag input, int direction, int offset, int type, CompoundTag storage)
+    public void setModel(ListTag input, int direction, int offset, int type, CompoundTag storage,ListTag addons)
     {
         ItemStack itemStack = new ItemStack(Items.OAK_PLANKS);
         CompoundTag tag = new CompoundTag();
@@ -121,6 +147,7 @@ public class BlockShipEntity extends PigEntity {
         tag.putInt("offset",offset);
         tag.putInt("type",type);
         tag.put("storage",storage);
+        tag.put("addons",addons);
         itemStack.setTag(tag);
         this.equipStack(EquipmentSlot.CHEST,itemStack);
     }
@@ -140,7 +167,8 @@ public class BlockShipEntity extends PigEntity {
             for (Tag tag : list)
             {
                 String[] split = tag.asString().split(" ");
-                if (!world.getBlockState(this.getBlockPos().add(Integer.parseInt(split[1]), Integer.parseInt(split[2]) + offset, Integer.parseInt(split[3]))).isAir()) {
+                BlockState state =world.getBlockState(this.getBlockPos().add(Integer.parseInt(split[1]), Integer.parseInt(split[2]) + offset, Integer.parseInt(split[3])));
+                if (!state.isAir() && !state.isOf(Blocks.WATER)) {
                     if (this.getPrimaryPassenger() instanceof PlayerEntity) {
                         ((PlayerEntity) this.getPrimaryPassenger()).sendMessage(new LiteralText("cannot disassemble, not enough space"), false);
                     }
@@ -242,6 +270,16 @@ public class BlockShipEntity extends PigEntity {
             return ActionResult.SUCCESS;
         }
         return ActionResult.FAIL;
+    }
+
+    @Override
+    public boolean isInvulnerable() {
+        return true;
+    }
+
+    @Override
+    public boolean isInvulnerableTo(DamageSource damageSource) {
+        return true;
     }
 
     @Override
