@@ -40,7 +40,7 @@ public class BlockControlWheel extends HorizontalFacingBlock {
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return Block.createCuboidShape(1d,0d,1d,15d,8d,15d);
+        return Block.createCuboidShape(0d,0d,0d,16d,12d,37d);
     }
 
     @Override
