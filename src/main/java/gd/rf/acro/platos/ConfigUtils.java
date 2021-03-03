@@ -64,7 +64,7 @@ public class ConfigUtils {
         defaults.add("#should vehicle material use a whitelist? (default: false)");
         defaults.add("whitelist=false");
         defaults.add("#amount of blocks 1 Airship Balloon can lift (default: 2)");
-        defaults.add("balloon=2");
+        defaults.add("balloon=1000");
         defaults.add("#amount of blocks 1 Water Float can lift (default: 20)");
         defaults.add("float=20");
         defaults.add("#amount of blocks 1 wheel can lift (default: 10)");
