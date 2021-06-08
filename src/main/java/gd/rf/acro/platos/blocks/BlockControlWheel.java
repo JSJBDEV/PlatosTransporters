@@ -4,26 +4,25 @@ import gd.rf.acro.platos.ConfigUtils;
 import gd.rf.acro.platos.PlatosTransporters;
 import gd.rf.acro.platos.entity.BlockShipEntity;
 import net.minecraft.block.*;
-import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Clearable;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
@@ -55,9 +54,9 @@ public class BlockControlWheel extends HorizontalFacingBlock {
             int blocks = 0;
             int balances = 0;
             HashMap<String,Integer> used = new HashMap<>();
-            ListTag list = new ListTag();
-            ListTag addons = new ListTag();
-            CompoundTag storage = new CompoundTag();
+            NbtList list = new NbtList();
+            NbtList addons = new NbtList();
+            NbtCompound storage = new NbtCompound();
 
             List<Integer[]> filtered = new ArrayList<>();
             List<Integer[]> accepted = new ArrayList<>();
@@ -76,17 +75,16 @@ public class BlockControlWheel extends HorizontalFacingBlock {
                     for (int j = -1; j < 2; j++) {
                         for (int k = -1; k < 2; k++)
                         {
-                            if(!world.getBlockState(gpos.add(i, j, k)).isAir() && !world.getBlockState(gpos.add(i, j, k)).getBlock().getTranslationKey().contains("ore") && world.getBlockState(gpos.add(i, j, k)).getFluidState().isEmpty())
+                            if(!world.getBlockState(gpos.add(i, j, k)).isAir() && !world.getBlockState(gpos.add(i, j, k)).getBlock().getTranslationKey().contains("ore")
+                                    && world.getBlockState(gpos.add(i, j, k)).getBlock()!=Blocks.WATER
+                                    && world.getBlockState(gpos.add(i, j, k)).getBlock()!=Blocks.LAVA)
                             {
                                 if ((whitelist.equals("true") && PlatosTransporters.BOAT_MATERIAL.contains(world.getBlockState(gpos.add(i, j, k)).getBlock())
                                 ) || (whitelist.equals("false") && !PlatosTransporters.BOAT_MATERIAL_BLACKLIST.contains(world.getBlockState(gpos.add(i, j, k)).getBlock())))
                                 {
                                     Integer[] passable = new Integer[]{thisPos[0]+i,thisPos[1]+j,thisPos[2]+k};
-                                    if(i==0 && j==0 && k==0)
+                                    if (i != 0 || j != 0 || k != 0)
                                     {
-                                        //System.out.println("centre block skipping");
-                                    }
-                                    else {
                                         boolean b = false;
                                         for (Integer[] integers : filtered) {
                                             if (Arrays.equals(integers, passable)) {
@@ -94,12 +92,8 @@ public class BlockControlWheel extends HorizontalFacingBlock {
                                                 break;
                                             }
                                         }
-                                        if(b)
+                                        if(!b)
                                         {
-
-                                            //System.out.println("already added, skipping");
-                                        }
-                                        else {
                                             boolean result = false;
                                             for (Integer[] inside : accepted) {
                                                 if (Arrays.equals(inside, passable)) {
@@ -107,11 +101,7 @@ public class BlockControlWheel extends HorizontalFacingBlock {
                                                     break;
                                                 }
                                             }
-                                            if(result)
-                                            {
-                                                //System.out.println("already accepted, skipping");
-                                            }
-                                            else
+                                            if(!result)
                                             {
                                                 filtered.add(passable);
                                                 if(passable[0]>mposx)
@@ -155,21 +145,21 @@ public class BlockControlWheel extends HorizontalFacingBlock {
                 int k = integers[2];
                 {
                     addIfCan(used, world.getBlockState(pos.add(i, j, k)).getBlock().getTranslationKey(), 1);
-                    list.add(StringTag.of(
+                    list.add(NbtString.of(
                             Block.getRawIdFromState(world.getBlockState(pos.add(i, j, k))) + " " + i + " " + j + " " + k));
                     blocks++;
 
                     if(world.getBlockState(pos.add(i, j, k)).getBlock()==Blocks.BLAST_FURNACE)
                     {
-                        addons.add(StringTag.of("engine"));
+                        addons.add(NbtString.of("engine"));
                     }
-                    if(world.getBlockState(pos.add(i, j, k)).getBlock()==Blocks.REDSTONE_LAMP)
+                    if(world.getBlockState(pos.add(i, j, k)).getBlock()==Blocks.ANVIL)
                     {
-                        addons.add(StringTag.of("altitude"));
+                        addons.add(NbtString.of("altitude"));
                     }
 
                     if (world.getBlockEntity(pos.add(i, j, k)) != null) {
-                        CompoundTag data = world.getBlockEntity(pos.add(i, j, k)).toTag(new CompoundTag());
+                        NbtCompound data = world.getBlockEntity(pos.add(i, j, k)).writeNbt(new NbtCompound());
                         storage.put(i + " " + j + " " + k, data);
                     }
 
@@ -203,6 +193,7 @@ public class BlockControlWheel extends HorizontalFacingBlock {
                 if(type==0)
                 {
                     player.sendMessage(new LiteralText("Requires "+blocks/floats+" floats, you have "+balances/floats),false);
+
                 }
                 if(type==1)
                 {
@@ -224,8 +215,7 @@ public class BlockControlWheel extends HorizontalFacingBlock {
                 world.setBlockState(pos.add(Integer.parseInt(vv[1]),Integer.parseInt(vv[2]),Integer.parseInt(vv[3])), Blocks.AIR.getDefaultState());
             });
 
-            BlockShipEntity entity = new BlockShipEntity(PlatosTransporters.BLOCK_SHIP_ENTITY_ENTITY_TYPE, world);
-            int offset = 1;
+              int offset = 1;
             if(player.getStackInHand(hand).getItem()==PlatosTransporters.LIFT_JACK_ITEM)
             {
                 if(player.getStackInHand(hand).hasTag())
@@ -233,10 +223,17 @@ public class BlockControlWheel extends HorizontalFacingBlock {
                     offset=player.getStackInHand(hand).getTag().getInt("off");
                 }
             }
-            entity.setBoundingBox(new Box(nposx,nposy,nposz,mposx,nposy,nposz));
+            BlockShipEntity entity = PlatosTransporters.BLOCK_SHIP_ENTITY_ENTITY_TYPE.spawn((ServerWorld) world,null,null,player,player.getBlockPos(), SpawnReason.EVENT,false,false);
             entity.setModel(list,getDirection(state),offset,type,storage,addons);
-            entity.teleport(player.getX(), player.getY(), player.getZ());
-            world.spawnEntity(entity);
+            if(type==1 || type == 0)
+            {
+                entity.equipStack(EquipmentSlot.HEAD,new ItemStack(Items.STICK));
+            }
+            if(type==1)
+            {
+                entity.setNoGravity(true);
+            }
+
             player.startRiding(entity, true);
             return ActionResult.SUCCESS;
         }

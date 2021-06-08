@@ -17,7 +17,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
-import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -29,7 +28,7 @@ public class BoardingStairsItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        HitResult result =user.rayTrace(100,0,true);
+        HitResult result =user.raycast(100,0,true);
         for (int i = 0; i < 30; i++) {
             world.addParticle(ParticleTypes.SMOKE,user.getRotationVector().multiply(i).x,user.getRotationVector().multiply(i).y,user.getRotationVector().multiply(i).z,0,0,0);
         }

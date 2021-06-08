@@ -7,6 +7,7 @@
     "#minecraft:crops",
     "#minecraft:ice",
     "#minecraft:leaves",
+    "#minecraft:nylium",
     "minecraft:stone",
     "minecraft:snow",
     "minecraft:snow_block",
@@ -20,6 +21,12 @@
     "minecraft:fern",
     "minecraft:netherrack",
     "minecraft:dead_bush",
-    "minecraft:farmland"
+    "minecraft:farmland",
+    "minecraft:scaffolding",
+    "minecraft:gravel",
+    "minecraft:dirt_path",
+    "minecraft:clay",
+    "minecraft:sand"
+
   ]
 }

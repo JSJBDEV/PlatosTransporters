@@ -5,7 +5,8 @@
 		"4": "block/brown_wool",
 		"6": "block/red_concrete",
 		"7": "block/iron_block",
-		"10": "block/oak_planks"
+		"10": "block/oak_planks",
+		"particle": "block/oak_planks"
 	},
 	"elements": [
 		{

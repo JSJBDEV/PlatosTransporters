@@ -17,6 +17,12 @@
 
   "itemGroup.platos.tab": "Plato's Transporters",
 
+  "category.platos.main": "Plato's Transporters",
+
+  "key.platos.up": "Fly airship up",
+  "key.platos.down": "Fly airship down",
+  "key.platos.stop": "Freeze/Unfreeze airship direction",
+
   "book.platos.page1": "Welcome to platos transporters, this mod is in early release so there could be §lbugs",
   "book.platos.page2": "§lGetting Started§r \n\nTo get started you first need to craft a §oShip Controller§r and a §oControl Key§r you may also want to craft a §oShip Lift Jack§r. To create a vehicle, it requires the correct amount of floats, balloons or wheel for it's desired terrain",
   "book.platos.page3": "1 Water Float = 20 blocks \n\n1 Wheel = 10 blocks \n\n1 airship Balloon = 2 blocks \n\n(these are all configurable) assembly your ship out of valid boat materials and then place the controller",
