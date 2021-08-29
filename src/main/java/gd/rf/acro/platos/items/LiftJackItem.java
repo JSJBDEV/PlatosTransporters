@@ -24,11 +24,11 @@ public class LiftJackItem extends Item {
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if(!stack.hasTag())
+        if(!stack.hasNbt())
         {
             NbtCompound tag = new NbtCompound();
             tag.putInt("off",1);
-            stack.setTag(tag);
+            stack.setNbt(tag);
         }
     }
 
@@ -40,9 +40,9 @@ public class LiftJackItem extends Item {
             Hand hand = context.getHand();
             NbtCompound tag = new NbtCompound();
             tag.putInt("off",1);
-            if(user.getStackInHand(hand).hasTag())
+            if(user.getStackInHand(hand).hasNbt())
             {
-                tag=user.getStackInHand(hand).getTag();
+                tag=user.getStackInHand(hand).getNbt();
             }
             if(user.isSneaking() && tag.getInt("off")>1)
             {
@@ -54,7 +54,7 @@ public class LiftJackItem extends Item {
                 tag.putInt("off",tag.getInt("off")+1);
             }
             user.sendMessage(new LiteralText("new height: "+tag.getInt("off")),true);
-            user.getStackInHand(hand).setTag(tag);
+            user.getStackInHand(hand).setNbt(tag);
             PlatosTransporters.givePlayerStartBook(user);
         }
         return super.useOnBlock(context);
@@ -63,10 +63,10 @@ public class LiftJackItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
-        if(stack.hasTag())
+        if(stack.hasNbt())
         {
             tooltip.add(new TranslatableText("liftjack.platos.tooltip"));
-            tooltip.add(new LiteralText(stack.getTag().getInt("off")+" ").append(new TranslatableText("liftjack.platos.tooltip2")));
+            tooltip.add(new LiteralText(stack.getNbt().getInt("off")+" ").append(new TranslatableText("liftjack.platos.tooltip2")));
 
         }
     }

@@ -81,11 +81,11 @@ public class PlatosTransporters implements ModInitializer {
 					vehicle.setYaw(vehicle.getYaw()-5);
 
 				}
-				if(move==3 && ((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==1)
+				if(move==3 && ((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getNbt().getInt("type")==1)
 				{
 					vehicle.setVelocity(new Vec3d(0,0.2,0));
 				}
-				if(move==4 && ((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==1)
+				if(move==4 && ((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getNbt().getInt("type")==1)
 				{
 					vehicle.setVelocity(new Vec3d(0,-0.2,0));
 
@@ -164,7 +164,7 @@ public class PlatosTransporters implements ModInitializer {
 			contents.add(NbtString.of("{\"text\":\""+page+"\"}"));
 		}
 		tags.put("pages",contents);
-		book.setTag(tags);
+		book.setNbt(tags);
 		return book;
 	}
 }

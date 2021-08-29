@@ -43,7 +43,7 @@ public class BlockShipEntity extends PigEntity {
     public boolean canWalkOnFluid(Fluid fluid) {
         if(this.getEquippedStack(EquipmentSlot.CHEST).getItem()==Items.OAK_PLANKS)
         {
-            if(this.getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==0)
+            if(this.getEquippedStack(EquipmentSlot.CHEST).getNbt().getInt("type")==0)
             {
                 return FluidTags.WATER.contains(fluid);
             }
@@ -63,11 +63,11 @@ public class BlockShipEntity extends PigEntity {
             {
                 if(this.getEquippedStack(EquipmentSlot.CHEST).getItem()==Items.OAK_PLANKS)
                 {
-                    if(this.getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==0)
+                    if(this.getEquippedStack(EquipmentSlot.CHEST).getNbt().getInt("type")==0)
                     {
                         if(this.world.getBlockState(this.getBlockPos().down()).getBlock()== Blocks.WATER)
                         {
-                            NbtList go = (NbtList) this.getEquippedStack(EquipmentSlot.CHEST).getTag().get("addons");
+                            NbtList go = (NbtList) this.getEquippedStack(EquipmentSlot.CHEST).getNbt().get("addons");
                             if(go.contains(NbtString.of("engine")))
                             {
                                 return cspeed*1.5f;
@@ -76,13 +76,13 @@ public class BlockShipEntity extends PigEntity {
                         }
                         return nspeed;
                     }
-                    if(this.getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==1)
+                    if(this.getEquippedStack(EquipmentSlot.CHEST).getNbt().getInt("type")==1)
                     {
                         return 0f;
                     }
                     else
                     {
-                        NbtList go = (NbtList) this.getEquippedStack(EquipmentSlot.CHEST).getTag().get("addons");
+                        NbtList go = (NbtList) this.getEquippedStack(EquipmentSlot.CHEST).getNbt().get("addons");
                         if(go.contains(NbtString.of("engine")))
                         {
                             return cspeed*1.5f;
@@ -149,7 +149,7 @@ public class BlockShipEntity extends PigEntity {
         tag.putInt("type",type);
         tag.put("storage",storage);
         tag.put("addons",addons);
-        itemStack.setTag(tag);
+        itemStack.setNbt(tag);
         this.equipStack(EquipmentSlot.CHEST,itemStack);
     }
 
@@ -164,9 +164,9 @@ public class BlockShipEntity extends PigEntity {
     {
         if(this.getEquippedStack(EquipmentSlot.CHEST).getItem()==Items.OAK_PLANKS)
         {
-            NbtList list = (NbtList) this.getEquippedStack(EquipmentSlot.CHEST).getTag().get("parts");
-            int offset = this.getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("offset");
-            NbtCompound storage = this.getEquippedStack(EquipmentSlot.CHEST).getTag().getCompound("storage");
+            NbtList list = (NbtList) this.getEquippedStack(EquipmentSlot.CHEST).getNbt().get("parts");
+            int offset = this.getEquippedStack(EquipmentSlot.CHEST).getNbt().getInt("offset");
+            NbtCompound storage = this.getEquippedStack(EquipmentSlot.CHEST).getNbt().getCompound("storage");
             for (NbtElement tag : list)
             {
                 String[] split = tag.asString().split(" ");
@@ -208,7 +208,7 @@ public class BlockShipEntity extends PigEntity {
     private Integer[] shouldRotateStructure(int i, int j, int k)
     {
         if(!world.isClient){
-            int direction = this.getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("direction");
+            int direction = this.getEquippedStack(EquipmentSlot.CHEST).getNbt().getInt("direction");
             int curDir = getClosestAxis();
             if(direction==curDir)
             {
@@ -288,7 +288,7 @@ public class BlockShipEntity extends PigEntity {
         }
         if(!player.getEntityWorld().isClient && player.getStackInHand(hand).getItem()==PlatosTransporters.LIFT_JACK_ITEM && hand==Hand.MAIN_HAND)
         {
-            this.getEquippedStack(EquipmentSlot.CHEST).getTag().putInt("offset",player.getStackInHand(hand).getTag().getInt("off"));
+            this.getEquippedStack(EquipmentSlot.CHEST).getNbt().putInt("offset",player.getStackInHand(hand).getNbt().getInt("off"));
             return ActionResult.SUCCESS;
         }
         return ActionResult.FAIL;
@@ -321,7 +321,7 @@ public class BlockShipEntity extends PigEntity {
         passenger.fallDistance=0;
         if(this.getEquippedStack(EquipmentSlot.CHEST).getItem()==Items.OAK_PLANKS)
         {
-            extra = this.getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("offset")-1;
+            extra = this.getEquippedStack(EquipmentSlot.CHEST).getNbt().getInt("offset")-1;
         }
         if(this.getPrimaryPassenger() instanceof PlayerEntity)
         {
