@@ -218,9 +218,9 @@ public class BlockControlWheel extends HorizontalFacingBlock {
               int offset = 1;
             if(player.getStackInHand(hand).getItem()==PlatosTransporters.LIFT_JACK_ITEM)
             {
-                if(player.getStackInHand(hand).hasTag())
+                if(player.getStackInHand(hand).hasNbt())
                 {
-                    offset=player.getStackInHand(hand).getTag().getInt("off");
+                    offset=player.getStackInHand(hand).getNbt().getInt("off");
                 }
             }
             BlockShipEntity entity = PlatosTransporters.BLOCK_SHIP_ENTITY_ENTITY_TYPE.spawn((ServerWorld) world,null,null,player,player.getBlockPos(), SpawnReason.EVENT,false,false);

@@ -24,7 +24,7 @@ public class ControlKeyItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if(user.getVehicle() instanceof BlockShipEntity && !world.isClient)
         {
-            NbtCompound tag =((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getTag();
+            NbtCompound tag =((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getNbt();
             if(tag.getInt("type")==1)
             {
                 user.getVehicle().setVelocity(user.getRotationVector().x,user.getRotationVector().y,user.getRotationVector().z);

@@ -30,7 +30,7 @@ public class BlockShipEntityModel extends EntityModel<BlockShipEntity> {
         }
         if(entity.getEquippedStack(EquipmentSlot.CHEST).getItem()== Items.OAK_PLANKS)
         {
-            NbtCompound tag = entity.getEquippedStack(EquipmentSlot.CHEST).getTag();
+            NbtCompound tag = entity.getEquippedStack(EquipmentSlot.CHEST).getNbt();
             this.ship=tag.getString("model");
             this.entities.put(this.ship,(NbtList)tag.get("parts"));
             this.direction=tag.getInt("direction");
