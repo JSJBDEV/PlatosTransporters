@@ -59,8 +59,6 @@ public class ConfigUtils {
     private static List<String> makeDefaults()
     {
         List<String> defaults = new ArrayList<>();
-        defaults.add("#radius of blocks to be used in a single ship (default: 20)");
-        defaults.add("radius=20");
         defaults.add("#should vehicle material use a whitelist? (default: false)");
         defaults.add("whitelist=false");
         defaults.add("#amount of blocks 1 Airship Balloon can lift (default: 2)");
@@ -69,7 +67,6 @@ public class ConfigUtils {
         defaults.add("float=20");
         defaults.add("#amount of blocks 1 wheel can lift (default: 10)");
         defaults.add("wheel=10");
-
         defaults.add("#speed of vehicles on their correct terrain (default: 0.2)");
         defaults.add("cspeed=0.2");
         defaults.add("#speed of vehicles when not on their correct terrain (default: 0.05)");

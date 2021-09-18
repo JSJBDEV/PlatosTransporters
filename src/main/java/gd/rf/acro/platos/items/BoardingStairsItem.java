@@ -3,13 +3,10 @@ package gd.rf.acro.platos.items;
 import gd.rf.acro.platos.PlatosTransporters;
 import gd.rf.acro.platos.entity.BlockShipEntity;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -28,11 +25,11 @@ public class BoardingStairsItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        HitResult result =user.raycast(100,0,true);
+        HitResult result =user.rayTrace(100,0,true);
         for (int i = 0; i < 30; i++) {
             world.addParticle(ParticleTypes.SMOKE,user.getRotationVector().multiply(i).x,user.getRotationVector().multiply(i).y,user.getRotationVector().multiply(i).z,0,0,0);
         }
-        List<BlockShipEntity> vv = world.getEntitiesByType(PlatosTransporters.BLOCK_SHIP_ENTITY_ENTITY_TYPE,new Box(result.getPos().add(-10,-10,-10),result.getPos().add(10,10,10)), LivingEntity::isAlive);
+        List<BlockShipEntity> vv = world.getEntities(PlatosTransporters.BLOCK_SHIP_ENTITY_ENTITY_TYPE,new Box(result.getPos().add(-10,-10,-10),result.getPos().add(10,10,10)), LivingEntity::isAlive);
         if(vv.size()>0)
         {
             user.startRiding(vv.get(0));

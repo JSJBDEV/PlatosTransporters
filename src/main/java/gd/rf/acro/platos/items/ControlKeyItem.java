@@ -32,9 +32,11 @@ public class ControlKeyItem extends Item {
                 if(((ListTag)tag.get("addons")).contains(StringTag.of("altitude")))
                 {
                     user.getVehicle().setNoGravity(false);
+                }
+                else
+                {
                     ((BlockShipEntity) user.getVehicle()).addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 9999, 2, true, false));
                 }
-
             }
         }
         PlatosTransporters.givePlayerStartBook(user);

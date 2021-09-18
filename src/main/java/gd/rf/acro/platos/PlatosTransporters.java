@@ -6,47 +6,31 @@ import gd.rf.acro.platos.entity.BlockShipEntity;
 import gd.rf.acro.platos.items.*;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.fabricmc.fabric.api.tag.TagRegistry;
-import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
-import net.minecraft.client.gui.screen.options.ControlsListWidget;
-import net.minecraft.client.options.GameOptions;
-import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.EntityCategory;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.tag.Tag;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
-import org.lwjgl.glfw.GLFW;
 
-import static gd.rf.acro.platos.ClientInit.up;
-import static gd.rf.acro.platos.ClientInit.down;
-import static gd.rf.acro.platos.ClientInit.stop;
+import static gd.rf.acro.platos.ClientInit.*;
 
 public class PlatosTransporters implements ModInitializer {
 	public static final ItemGroup TAB = FabricItemGroupBuilder.build(
@@ -55,79 +39,126 @@ public class PlatosTransporters implements ModInitializer {
 	
 	public static final EntityType<BlockShipEntity> BLOCK_SHIP_ENTITY_ENTITY_TYPE =
 			Registry.register(Registry.ENTITY_TYPE,new Identifier("platos","block_ship")
-					, FabricEntityTypeBuilder.create(SpawnGroup.AMBIENT,BlockShipEntity::new).dimensions(EntityDimensions.fixed(3,1)).trackRangeBlocks(100).build());
+					, FabricEntityTypeBuilder.create(EntityCategory.AMBIENT,BlockShipEntity::new).dimensions(EntityDimensions.fixed(4,4)).trackable(100,4).build());
 
 	public static final Tag<Block> BOAT_MATERIAL = TagRegistry.block(new Identifier("platos","boat_material"));
 	public static final Tag<Block> BOAT_MATERIAL_BLACKLIST = TagRegistry.block(new Identifier("platos","boat_material_blacklist"));
 	public static final Tag<Block> SCYTHEABLE = TagRegistry.block(new Identifier("platos","scytheable"));
-
 	public static Identifier forwardPacket = new Identifier("platos","forwardpacket");
-
 
 	@Override
 	public void onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
-		FabricDefaultAttributeRegistry.register(BLOCK_SHIP_ENTITY_ENTITY_TYPE, MobEntity.createMobAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 100.0D).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25D));
 		registerBlocks();
 		registerItems();
 		ConfigUtils.checkConfigs();
 		System.out.println("Hello Fabric world!");
-
-
-		ServerPlayNetworking.registerGlobalReceiver(forwardPacket,(server,handler,packetContext, attachedData,sender) ->
+		ClientTickEvents.START_CLIENT_TICK.register(client ->
 		{
-			PlayerEntity user = packetContext.player;
+			while (client.options.keyForward.wasPressed()) {
+				PacketByteBuf forw = new PacketByteBuf(Unpooled.buffer());
+				forw.writeInt(0);
+				ClientSidePacketRegistry.INSTANCE.sendToServer(forwardPacket,forw);
+			}
 
-			if(user.hasVehicle() && user.getVehicle() instanceof BlockShipEntity)
+		});
+		ClientTickEvents.START_CLIENT_TICK.register(client ->
+		{
+			while (client.options.keyLeft.wasPressed()) {
+				PacketByteBuf forw = new PacketByteBuf(Unpooled.buffer());
+				forw.writeInt(1);
+				ClientSidePacketRegistry.INSTANCE.sendToServer(forwardPacket,forw);
+			}
+
+		});
+		ClientTickEvents.START_CLIENT_TICK.register(client ->
+		{
+			while (client.options.keyRight.wasPressed()) {
+				PacketByteBuf forw = new PacketByteBuf(Unpooled.buffer());
+				forw.writeInt(2);
+				ClientSidePacketRegistry.INSTANCE.sendToServer(forwardPacket,forw);
+			}
+
+		});
+		ClientTickEvents.START_CLIENT_TICK.register(client ->
+		{
+			while (up.wasPressed()) {
+				PacketByteBuf forw = new PacketByteBuf(Unpooled.buffer());
+				forw.writeInt(3);
+				ClientSidePacketRegistry.INSTANCE.sendToServer(forwardPacket,forw);
+			}
+
+		});
+		ClientTickEvents.START_CLIENT_TICK.register(client ->
+		{
+			while (down.wasPressed()) {
+				PacketByteBuf forw = new PacketByteBuf(Unpooled.buffer());
+				forw.writeInt(4);
+				ClientSidePacketRegistry.INSTANCE.sendToServer(forwardPacket,forw);
+			}
+
+		});
+		ClientTickEvents.END_CLIENT_TICK.register(client ->
+		{
+			while (stop.wasPressed()) {
+				PacketByteBuf forw = new PacketByteBuf(Unpooled.buffer());
+				forw.writeInt(5);
+				ClientSidePacketRegistry.INSTANCE.sendToServer(forwardPacket,forw);
+			}
+
+		});
+		ServerSidePacketRegistry.INSTANCE.register(forwardPacket,(packetContext, attachedData) ->
+		{
+			PlayerEntity user = packetContext.getPlayer();
+			if(user.hasVehicle() && user.getVehicle() instanceof BlockShipEntity && ((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==1)
 			{
 
 				int move = attachedData.readInt();
-				BlockShipEntity vehicle = (BlockShipEntity) user.getVehicle();
 				if(move==0)
 				{
-
-					user.getVehicle().setVelocity(new Vec3d(vehicle.getRotationVector().x,vehicle.getRotationVector().y,vehicle.getRotationVector().z).multiply(0.8));
+					user.getVehicle().setVelocity(new Vec3d(user.getRotationVector().x,user.getRotationVector().y,user.getRotationVector().z).multiply(0.8));
 				}
 				if(move==2)
 				{
-					vehicle.yaw+=5;
+					user.getVehicle().setVelocity(new Vec3d(user.getVehicle().getRotationVector().x,user.getVehicle().getRotationVector().y,user.getVehicle().getRotationVector().z).multiply(0.8).rotateY(-90));
+
 				}
 				if(move==1)
 				{
-					vehicle.yaw-=5;
+					user.getVehicle().setVelocity(new Vec3d(user.getVehicle().getRotationVector().x,user.getVehicle().getRotationVector().y,user.getVehicle().getRotationVector().z).multiply(0.8).rotateY(90));
 
 				}
-				if(move==3 && ((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==1)
+				if(move==3)
 				{
-					vehicle.setVelocity(new Vec3d(0,0.2,0));
+					user.getVehicle().setVelocity(new Vec3d(0,1,0));
 				}
-				if(move==4 && ((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==1)
+				if(move==4)
 				{
-					vehicle.setVelocity(new Vec3d(0,-0.2,0));
+					user.getVehicle().setVelocity(new Vec3d(0,-1,0));
 
 				}
 				if(move==5)
 				{
-
-					if(vehicle.getEquippedStack(EquipmentSlot.HEAD).getItem()==Items.STICK)
+					BlockShipEntity entity = (BlockShipEntity) user.getVehicle();
+					if(entity.getEquippedStack(EquipmentSlot.HEAD).getItem()==Items.STICK)
 					{
-						vehicle.equipStack(EquipmentSlot.HEAD,ItemStack.EMPTY);
+						entity.equipStack(EquipmentSlot.HEAD,ItemStack.EMPTY);
 					}
 					else
 					{
-						vehicle.equipStack(EquipmentSlot.HEAD,new ItemStack(Items.STICK));
+						entity.equipStack(EquipmentSlot.HEAD,new ItemStack(Items.STICK));
 					}
 
 				}
 			}
 		});
 	}
-	public static final BlockControlWheel BLOCK_CONTROL_WHEEL = new BlockControlWheel(AbstractBlock.Settings.of(Material.WOOD));
-	public static final NotFullBlock BALLOON_BLOCK = new NotFullBlock(AbstractBlock.Settings.of(Material.WOOL));
-	public static final NotFullBlock FLOAT_BLOCK = new NotFullBlock(AbstractBlock.Settings.of(Material.WOOL));
-	public static final NotFullBlock WHEEL_BLOCK = new NotFullBlock(AbstractBlock.Settings.of(Material.WOOL));
+	public static final BlockControlWheel BLOCK_CONTROL_WHEEL = new BlockControlWheel(Block.Settings.of(Material.WOOD));
+	public static final NotFullBlock BALLOON_BLOCK = new NotFullBlock(Block.Settings.of(Material.WOOL));
+	public static final NotFullBlock FLOAT_BLOCK = new NotFullBlock(Block.Settings.of(Material.WOOL));
+	public static final NotFullBlock WHEEL_BLOCK = new NotFullBlock(Block.Settings.of(Material.WOOL));
 	private void registerBlocks()
 	{
 		Registry.register(Registry.BLOCK,new Identifier("platos","ship_controller"),BLOCK_CONTROL_WHEEL);
@@ -156,18 +187,17 @@ public class PlatosTransporters implements ModInitializer {
 
 	public static void givePlayerStartBook(PlayerEntity playerEntity)
 	{
-		if(!playerEntity.getScoreboardTags().contains("platos_new") && playerEntity.world.isClient)
+		if(!playerEntity.getScoreboardTags().contains("platos_new"))
 		{
-
 			playerEntity.giveItemStack(createBook("Acro","Plato's Transporters"
-					,I18n.translate("book.platos.page1")
+					, I18n.translate("book.platos.page1")
 					,I18n.translate("book.platos.page2")
 					,I18n.translate("book.platos.page3")
 					,I18n.translate("book.platos.page4")
 					,I18n.translate("book.platos.page5")
 					,I18n.translate("book.platos.page6")
 					,I18n.translate("book.platos.page7")
-					));
+			));
 			playerEntity.addScoreboardTag("platos_new");
 		}
 	}
