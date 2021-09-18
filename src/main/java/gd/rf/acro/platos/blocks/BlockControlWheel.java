@@ -4,25 +4,31 @@ import gd.rf.acro.platos.ConfigUtils;
 import gd.rf.acro.platos.PlatosTransporters;
 import gd.rf.acro.platos.entity.BlockShipEntity;
 import net.minecraft.block.*;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Clearable;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
@@ -54,9 +60,9 @@ public class BlockControlWheel extends HorizontalFacingBlock {
             int blocks = 0;
             int balances = 0;
             HashMap<String,Integer> used = new HashMap<>();
-            NbtList list = new NbtList();
-            NbtList addons = new NbtList();
-            NbtCompound storage = new NbtCompound();
+            ListTag list = new ListTag();
+            ListTag addons = new ListTag();
+            CompoundTag storage = new CompoundTag();
 
             List<Integer[]> filtered = new ArrayList<>();
             List<Integer[]> accepted = new ArrayList<>();
@@ -145,21 +151,21 @@ public class BlockControlWheel extends HorizontalFacingBlock {
                 int k = integers[2];
                 {
                     addIfCan(used, world.getBlockState(pos.add(i, j, k)).getBlock().getTranslationKey(), 1);
-                    list.add(NbtString.of(
+                    list.add(StringTag.of(
                             Block.getRawIdFromState(world.getBlockState(pos.add(i, j, k))) + " " + i + " " + j + " " + k));
                     blocks++;
 
                     if(world.getBlockState(pos.add(i, j, k)).getBlock()==Blocks.BLAST_FURNACE)
                     {
-                        addons.add(NbtString.of("engine"));
+                        addons.add(StringTag.of("engine"));
                     }
                     if(world.getBlockState(pos.add(i, j, k)).getBlock()==Blocks.ANVIL)
                     {
-                        addons.add(NbtString.of("altitude"));
+                        addons.add(StringTag.of("altitude"));
                     }
 
                     if (world.getBlockEntity(pos.add(i, j, k)) != null) {
-                        NbtCompound data = world.getBlockEntity(pos.add(i, j, k)).writeNbt(new NbtCompound());
+                        CompoundTag data = world.getBlockEntity(pos.add(i, j, k)).toTag(new CompoundTag());
                         storage.put(i + " " + j + " " + k, data);
                     }
 
@@ -218,9 +224,9 @@ public class BlockControlWheel extends HorizontalFacingBlock {
               int offset = 1;
             if(player.getStackInHand(hand).getItem()==PlatosTransporters.LIFT_JACK_ITEM)
             {
-                if(player.getStackInHand(hand).hasNbt())
+                if(player.getStackInHand(hand).hasTag())
                 {
-                    offset=player.getStackInHand(hand).getNbt().getInt("off");
+                    offset=player.getStackInHand(hand).getTag().getInt("off");
                 }
             }
             BlockShipEntity entity = PlatosTransporters.BLOCK_SHIP_ENTITY_ENTITY_TYPE.spawn((ServerWorld) world,null,null,player,player.getBlockPos(), SpawnReason.EVENT,false,false);

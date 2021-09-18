@@ -1,2 +1,9 @@
-# PlatosTransporters
-a "spiritual successor" to Archemides Ships/ Da Vincis Vessels, completely rewritten for fabric 1.16, supporting fabric and forge 1.16 and 1.15
+# Fabric Example Mod
+
+## Setup
+
+For setup instructions please see the [fabric wiki page](https://fabricmc.net/wiki/tutorial:setup) that relates to the IDE that you are using.
+
+## License
+
+This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.

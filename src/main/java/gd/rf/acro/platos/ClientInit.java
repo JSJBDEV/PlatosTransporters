@@ -1,13 +1,18 @@
 package gd.rf.acro.platos;
 
 import gd.rf.acro.platos.entity.BlockShipEntityRenderer;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.client.option.KeyBinding;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
 import org.lwjgl.glfw.GLFW;
@@ -21,7 +26,7 @@ public class ClientInit implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        EntityRendererRegistry.INSTANCE.register(PlatosTransporters.BLOCK_SHIP_ENTITY_ENTITY_TYPE, BlockShipEntityRenderer::new);
+        EntityRendererRegistry.INSTANCE.register(PlatosTransporters.BLOCK_SHIP_ENTITY_ENTITY_TYPE, (entityRenderDispatcher, context) -> new BlockShipEntityRenderer(entityRenderDispatcher));
         up = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.platos.up", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_Z,"category.platos.main"));
         down= KeyBindingHelper.registerKeyBinding(new KeyBinding("key.platos.down", InputUtil.Type.KEYSYM,GLFW.GLFW_KEY_C,"category.platos.main"));
         stop = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.platos.stop", InputUtil.Type.KEYSYM,GLFW.GLFW_KEY_V,"category.platos.main"));

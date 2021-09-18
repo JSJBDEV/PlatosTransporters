@@ -4,8 +4,14 @@ import gd.rf.acro.platos.blocks.BlockControlWheel;
 import gd.rf.acro.platos.blocks.NotFullBlock;
 import gd.rf.acro.platos.entity.BlockShipEntity;
 import gd.rf.acro.platos.items.*;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
+import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -13,7 +19,11 @@ import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
+import net.minecraft.client.gui.screen.options.ControlsListWidget;
+import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -22,13 +32,21 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.tag.Tag;
+import net.minecraft.text.StringVisitable;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
+import org.lwjgl.glfw.GLFW;
+
+import static gd.rf.acro.platos.ClientInit.up;
+import static gd.rf.acro.platos.ClientInit.down;
+import static gd.rf.acro.platos.ClientInit.stop;
 
 public class PlatosTransporters implements ModInitializer {
 	public static final ItemGroup TAB = FabricItemGroupBuilder.build(
@@ -74,18 +92,18 @@ public class PlatosTransporters implements ModInitializer {
 				}
 				if(move==2)
 				{
-					vehicle.setYaw(vehicle.getYaw()+5);
+					vehicle.yaw+=5;
 				}
 				if(move==1)
 				{
-					vehicle.setYaw(vehicle.getYaw()-5);
+					vehicle.yaw-=5;
 
 				}
-				if(move==3 && ((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getNbt().getInt("type")==1)
+				if(move==3 && ((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==1)
 				{
 					vehicle.setVelocity(new Vec3d(0,0.2,0));
 				}
-				if(move==4 && ((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getNbt().getInt("type")==1)
+				if(move==4 && ((BlockShipEntity) user.getVehicle()).getEquippedStack(EquipmentSlot.CHEST).getTag().getInt("type")==1)
 				{
 					vehicle.setVelocity(new Vec3d(0,-0.2,0));
 
@@ -156,15 +174,15 @@ public class PlatosTransporters implements ModInitializer {
 	private static ItemStack createBook(String author, String title,Object ...pages)
 	{
 		ItemStack book = new ItemStack(Items.WRITTEN_BOOK);
-		NbtCompound tags = new NbtCompound();
+		CompoundTag tags = new CompoundTag();
 		tags.putString("author",author);
 		tags.putString("title",title);
-		NbtList contents = new NbtList();
+		ListTag contents = new ListTag();
 		for (Object page : pages) {
-			contents.add(NbtString.of("{\"text\":\""+page+"\"}"));
+			contents.add(StringTag.of("{\"text\":\""+page+"\"}"));
 		}
 		tags.put("pages",contents);
-		book.setNbt(tags);
+		book.setTag(tags);
 		return book;
 	}
 }

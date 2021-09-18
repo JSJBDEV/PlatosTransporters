@@ -7,12 +7,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -24,11 +25,11 @@ public class LiftJackItem extends Item {
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if(!stack.hasNbt())
+        if(!stack.hasTag())
         {
-            NbtCompound tag = new NbtCompound();
+            CompoundTag tag = new CompoundTag();
             tag.putInt("off",1);
-            stack.setNbt(tag);
+            stack.setTag(tag);
         }
     }
 
@@ -38,11 +39,11 @@ public class LiftJackItem extends Item {
         {
             PlayerEntity user = context.getPlayer();
             Hand hand = context.getHand();
-            NbtCompound tag = new NbtCompound();
+            CompoundTag tag = new CompoundTag();
             tag.putInt("off",1);
-            if(user.getStackInHand(hand).hasNbt())
+            if(user.getStackInHand(hand).hasTag())
             {
-                tag=user.getStackInHand(hand).getNbt();
+                tag=user.getStackInHand(hand).getTag();
             }
             if(user.isSneaking() && tag.getInt("off")>1)
             {
@@ -54,7 +55,7 @@ public class LiftJackItem extends Item {
                 tag.putInt("off",tag.getInt("off")+1);
             }
             user.sendMessage(new LiteralText("new height: "+tag.getInt("off")),true);
-            user.getStackInHand(hand).setNbt(tag);
+            user.getStackInHand(hand).setTag(tag);
             PlatosTransporters.givePlayerStartBook(user);
         }
         return super.useOnBlock(context);
@@ -63,10 +64,10 @@ public class LiftJackItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
-        if(stack.hasNbt())
+        if(stack.hasTag())
         {
             tooltip.add(new TranslatableText("liftjack.platos.tooltip"));
-            tooltip.add(new LiteralText(stack.getNbt().getInt("off")+" ").append(new TranslatableText("liftjack.platos.tooltip2")));
+            tooltip.add(new LiteralText(stack.getTag().getInt("off")+" ").append(new TranslatableText("liftjack.platos.tooltip2")));
 
         }
     }
