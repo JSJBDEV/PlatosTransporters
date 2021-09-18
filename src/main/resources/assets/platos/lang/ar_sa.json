@@ -1,0 +1,13 @@
+{
+  "item.platos.control_key": "مفتاح التحكم",
+  "item.platos.wrench": "مفتاح الصواميل",
+  "item.platos.lift_jack": "سكين الرفع",
+  "item.platos.clearing_scythe": "محش",
+
+  "block.platos.ship_controller": "جهاز التحكم",
+  "block.platos.wheel_block": "عجلة",
+  "block.platos.float_block": "عوامة",
+  "block.platos.balloon_block": "منطاد",
+
+  "itemGroup.platos.tab": "مواصلات أفلاطون"
+}

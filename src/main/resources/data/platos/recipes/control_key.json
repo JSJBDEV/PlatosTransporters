@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "platos",
+  "pattern": [
+    "WW ",
+    "WRW",
+    " WW"
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:gold_nugget"
+    },
+    "R": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "platos:control_key",
+    "count": 1
+  }
+}

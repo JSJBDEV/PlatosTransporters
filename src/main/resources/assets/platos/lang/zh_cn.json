@@ -1,0 +1,28 @@
+{
+  "item.platos.control_key": "驾驶钥匙",
+  "item.platos.wrench": "拆卸扳手",
+  "item.platos.lift_jack": "载具起重器",
+  "item.platos.clearing_scythe": "除草镰刀",
+  "item.platos.boarding_stairs": "舷梯",
+
+  "block.platos.ship_controller": "载具控制器",
+  "block.platos.wheel_block": "车轮",
+  "block.platos.float_block": "浮筒",
+  "block.platos.balloon_block": "气囊",
+
+  "scythe.platos.tooltip": "高效除草！",
+  "liftjack.platos.tooltip":"玩家将会坐在这个方块上",
+  "liftjack.platos.tooltip2": "高于地面或水面的格数",
+  "boardingstairs.platos.tooltip": "对准远处的载具按右键驾驶！",
+
+  "itemGroup.platos.tab": "Plato's Transporters",
+
+  "book.platos.page1": "欢迎来到 Plato's Transporters 模组，本模组仍处于早起测试版本，所以可能存在§l漏洞",
+  "book.platos.page2": "§l开始建造§r \n\n首先，你需要制作一个§o载具控制器§r以及一把§o驾驶钥匙§r，你也可能需要一个§o载具起重器§r。要建造一辆载具，你需要根据载具类型和尺寸的不同制作相应数量的车轮、浮筒或气囊。",
+  "book.platos.page3": "1个车轮支持10个方块 \n\n1个浮筒支持20个方块 \n\n1个气囊支持2个方块 \n\n（这些是可以配置的）使用相应材料建造好你的载具，然后在上面放置载具控制器。",
+  "book.platos.page4": "对着载具控制器按下右键将会提示是否有建造错误或者成功创建出载具实体，所有容器和物品也都会保存完好。默认情况下玩家将会坐在载具控制器正前方距离地面1格高的位置，你可以使用载具起重器改变驾驶时的位置。",
+  "book.platos.page5": "载具起重器可以升降玩家驾驶时的位置，按右键或蹲下按右键更改高度（当前高度会显示在物品提示框），将载具起重器放在主手并对着载具控制器按右键即可改变驾驶高度。",
+  "book.platos.page6": "建造好载具后只需要手持驾驶钥匙即可向面朝着的方向前进，飞艇可以通过抬头或低头进行升降。",
+  "book.platos.page7": "你可以坐在驾驶座上按右键使用拆卸扳手来将载具变回方块。在旧版本中载具将会依照建造时的方向摆放，并且需要这个方向上没有方块阻挡才能成功，新版可能会有所改变。"
+
+}
