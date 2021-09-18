@@ -1,8 +1,0 @@
-{
-  "variants": {
-    "facing=north": { "model": "platos:block/ship_controller" },
-    "facing=east": { "model": "platos:block/ship_controller", "y":  90 },
-    "facing=south": { "model": "platos:block/ship_controller", "y":  180 },
-    "facing=west": { "model": "platos:block/ship_controller", "y":  270 }
-  }
-}
