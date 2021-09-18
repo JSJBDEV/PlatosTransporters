@@ -46,4 +46,5 @@ public class BoardingStairsItem extends Item {
         super.addInformation(p_77624_1_, p_77624_2_, p_77624_3_, p_77624_4_);
         p_77624_3_.add(new TranslationTextComponent("boardingstairs.platos.tooltip"));
     }
+
 }

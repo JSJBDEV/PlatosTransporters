@@ -5,11 +5,15 @@ import gd.rf.acro.platos.PlatosTransporters;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.*;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifierManager;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.controller.MovementController;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.effect.LightningBoltEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PigEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
@@ -23,11 +27,14 @@ import net.minecraft.nbt.StringNBT;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 public class BlockShipEntity extends PigEntity {
@@ -35,46 +42,33 @@ public class BlockShipEntity extends PigEntity {
         super(entityType, world);
     }
 
-    @Override
-    protected void registerAttributes() {
-        super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(8.0D);
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.16D);
+
+    public boolean func_230285_a_(Fluid p_230285_1_) {
+        return p_230285_1_.isIn(FluidTags.WATER);
     }
 
     @Override
     protected void registerGoals() {
     }
+    public static AttributeModifierMap.MutableAttribute getAttributes() {
+        return MobEntity.func_233666_p_().createMutableAttribute(Attributes.MAX_HEALTH, 10.0D).createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.25D);
+    }
+
+
 
     @Override
     public float getAIMoveSpeed() {
+        if(this.getControllingPassenger() instanceof  PlayerEntity)
         {
-            if(this.getControllingPassenger() instanceof  PlayerEntity)
+            if(((PlayerEntity) this.getControllingPassenger()).getHeldItemMainhand().getItem()== PlatosTransporters.CONTROL_KEY_ITEM)
             {
-                if(((PlayerEntity) this.getControllingPassenger()).getHeldItemMainhand().getItem()== PlatosTransporters.CONTROL_KEY_ITEM)
+                float cspeed = Float.parseFloat(ConfigUtils.config.getOrDefault("cspeed","0.2"));
+                float nspeed = Float.parseFloat(ConfigUtils.config.getOrDefault("nspeed","0.05"));
+                if(this.getItemStackFromSlot(EquipmentSlotType.CHEST).getItem()==Items.OAK_PLANKS)
                 {
-                    float cspeed = Float.parseFloat(ConfigUtils.config.getOrDefault("cspeed","0.2"));
-                    float nspeed = Float.parseFloat(ConfigUtils.config.getOrDefault("nspeed","0.05"));
-                    if(this.getItemStackFromSlot(EquipmentSlotType.CHEST).getItem()==Items.OAK_PLANKS)
+                    if(this.getItemStackFromSlot(EquipmentSlotType.CHEST).getTag().getInt("type")==0)
                     {
-                        if(this.getItemStackFromSlot(EquipmentSlotType.CHEST).getTag().getInt("type")==0)
-                        {
-                            if(this.world.getBlockState(this.getPositionUnderneath()).getBlock()== Blocks.WATER)
-                            {
-                                ListNBT go = (ListNBT) this.getItemStackFromSlot(EquipmentSlotType.CHEST).getTag().get("addons");
-                                if(go.contains(StringNBT.valueOf("engine")))
-                                {
-                                    return cspeed*1.5f;
-                                }
-                                return cspeed;
-                            }
-                            return nspeed;
-                        }
-                        if(this.getItemStackFromSlot(EquipmentSlotType.CHEST).getTag().getInt("type")==1)
-                        {
-                            return 0f;
-                        }
-                        else
+                        if(this.world.getBlockState(this.getPositionUnderneath()).getBlock()== Blocks.WATER)
                         {
                             ListNBT go = (ListNBT) this.getItemStackFromSlot(EquipmentSlotType.CHEST).getTag().get("addons");
                             if(go.contains(StringNBT.valueOf("engine")))
@@ -83,16 +77,26 @@ public class BlockShipEntity extends PigEntity {
                             }
                             return cspeed;
                         }
+                        return nspeed;
+                    }
+                    if(this.getItemStackFromSlot(EquipmentSlotType.CHEST).getTag().getInt("type")==1)
+                    {
+                        return 0f;
+                    }
+                    else
+                    {
+                        ListNBT go = (ListNBT) this.getItemStackFromSlot(EquipmentSlotType.CHEST).getTag().get("addons");
+                        if(go.contains(StringNBT.valueOf("engine")))
+                        {
+                            return cspeed*1.5f;
+                        }
+                        return cspeed;
                     }
                 }
             }
-            return 0;
         }
+        return 0;
     }
-
-
-
-
 
     @Override
     public boolean canBeRiddenInWater() {
@@ -111,6 +115,10 @@ public class BlockShipEntity extends PigEntity {
 
     @Override
     public boolean canBeSteered() {
+        if(this.getItemStackFromSlot(EquipmentSlotType.HEAD).getItem()==Items.STICK)
+        {
+            return false;
+        }
         return true;
     }
 
@@ -121,7 +129,7 @@ public class BlockShipEntity extends PigEntity {
         return 0;
     }
 
-    public void setModel(ListNBT input, int direction, int offset, int type, CompoundNBT storage, ListNBT addons)
+    public void setModel(ListNBT input, int direction, int offset, int type, CompoundNBT storage,ListNBT addons)
     {
         ItemStack itemStack = new ItemStack(Items.OAK_PLANKS);
         CompoundNBT tag = new CompoundNBT();
@@ -136,6 +144,24 @@ public class BlockShipEntity extends PigEntity {
         this.setItemStackToSlot(EquipmentSlotType.CHEST,itemStack);
     }
 
+    @Override
+    public boolean isInvulnerableTo(DamageSource p_180431_1_) {
+        if(p_180431_1_!=DamageSource.OUT_OF_WORLD)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isInvulnerable() {
+        if(!dead)
+        {
+            return true;
+        }
+        return false;
+    }
+
     public void tryDisassemble()
     {
         if(this.getItemStackFromSlot(EquipmentSlotType.CHEST).getItem()==Items.OAK_PLANKS)
@@ -147,10 +173,9 @@ public class BlockShipEntity extends PigEntity {
             {
                 String[] split = tag.getString().split(" ");
                 BlockState state =world.getBlockState(this.getPositionUnderneath().up().add(Integer.parseInt(split[1]), Integer.parseInt(split[2]) + offset, Integer.parseInt(split[3])));
-                if (!state.isAir() && state.getBlock()!=(Blocks.WATER))
-                {
+                if (!state.isAir() && state.getBlock()!=(Blocks.WATER)) {
                     if (this.getControllingPassenger() instanceof PlayerEntity) {
-                        this.getControllingPassenger().sendMessage(new StringTextComponent("cannot disassemble, not enough space"));
+                        this.getControllingPassenger().sendMessage(new StringTextComponent("cannot disassemble, not enough space"), UUID.randomUUID());
 
                     }
                     return;
@@ -172,7 +197,7 @@ public class BlockShipEntity extends PigEntity {
                     data.putInt("x", newpos.getX());
                     data.putInt("y", newpos.getY());
                     data.putInt("z", newpos.getZ());
-                    entity.handleUpdateTag(data);
+                    entity.handleUpdateTag(world.getBlockState(newpos), data);
                     entity.markDirty();
                 }
             });
@@ -183,7 +208,7 @@ public class BlockShipEntity extends PigEntity {
 
     @Override
     public boolean preventDespawn() {
-        return true;
+        return !this.dead;
     }
 
     @Override
@@ -193,24 +218,26 @@ public class BlockShipEntity extends PigEntity {
 
     @Override
     public boolean canPassengerSteer() {
-        return true;
-    }
-
-
-
-
-
-    @Override
-    public boolean processInteract(PlayerEntity playerEntity, Hand p_184645_2_) {
-        if(!playerEntity.world.isRemote)
+        if(this.getItemStackFromSlot(EquipmentSlotType.HEAD).getItem()==Items.STICK)
         {
-            playerEntity.startRiding(this);
+            return false;
         }
         return true;
     }
 
+
+
     @Override
-    public ActionResultType applyPlayerInteraction(PlayerEntity player, Vec3d p_184199_2_, Hand hand) {
+    public ActionResultType func_230254_b_(PlayerEntity p_230254_1_, Hand p_230254_2_) {
+        if(!p_230254_1_.world.isRemote)
+        {
+            p_230254_1_.startRiding(this);
+        }
+        return ActionResultType.SUCCESS;
+    }
+
+    @Override
+    public ActionResultType applyPlayerInteraction(PlayerEntity player, Vector3d p_184199_2_, Hand hand) {
         if(!player.getEntityWorld().isRemote && player.getHeldItem(hand)==ItemStack.EMPTY && hand==Hand.MAIN_HAND)
         {
             return ActionResultType.SUCCESS;
@@ -223,11 +250,11 @@ public class BlockShipEntity extends PigEntity {
         return super.applyPlayerInteraction(player, p_184199_2_, hand);
     }
 
-
-
     @Override
     public void updatePassenger(Entity passenger) {
         super.updatePassenger(passenger);
+        passenger.fallDistance=0;
+
         int extra = 0;
         if(this.getItemStackFromSlot(EquipmentSlotType.CHEST).getItem()==Items.OAK_PLANKS)
         {
@@ -242,44 +269,15 @@ public class BlockShipEntity extends PigEntity {
         }
     }
 
+
+
     @Override
     public boolean shouldRiderSit() {
         return true;
     }
 
     @Override
-    public boolean isInvulnerableTo(DamageSource p_180431_1_) {
-        return true;
-    }
-
-    @Override
-    public boolean isInvulnerable() {
-        return true;
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        if(this.inWater && this.getItemStackFromSlot(EquipmentSlotType.CHEST).getTag().getInt("type")==0)
-        {
-            if(this.getPassengers().size()>0
-                    && ((LivingEntity)this.getControllingPassenger()).getHeldItemMainhand().getItem() ==PlatosTransporters.CONTROL_KEY_ITEM)
-            {
-                Vec3d vec3d3 = this.getLookVec();
-                if(vec3d3.y<0)
-                {
-                    this.setMotion(vec3d3.x, 0, vec3d3.z);
-                }
-            }
-            else
-            {
-                this.setMotion(0, 0, 0);
-            }
-        }
-    }
-
-    @Override
-    public void onStruckByLightning(LightningBoltEntity p_70077_1_) {
+    public void func_241841_a(ServerWorld p_241841_1_, LightningBoltEntity p_241841_2_) {
 
     }
 }

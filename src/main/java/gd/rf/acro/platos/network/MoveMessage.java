@@ -1,12 +1,13 @@
 package gd.rf.acro.platos.network;
 
 import gd.rf.acro.platos.entity.BlockShipEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -35,43 +36,44 @@ public class MoveMessage {
                 ServerPlayerEntity user =context.get().getSender();
                 if(user.getRidingEntity()!=null && user.getRidingEntity() instanceof BlockShipEntity)
                 {
-                    int s = ((BlockShipEntity) user.getRidingEntity()).getItemStackFromSlot(EquipmentSlotType.CHEST).getTag().getInt("type");
+                    BlockShipEntity vehicle = (BlockShipEntity) user.getRidingEntity();
+                    int s = vehicle.getItemStackFromSlot(EquipmentSlotType.CHEST).getTag().getInt("type");
                     int move = state;
                     if(move==0)
                     {
-                        Vec3d v = new Vec3d(user.getLookVec().x,user.getLookVec().y,user.getLookVec().z).scale(0.8);
-                       
-                        user.getRidingEntity().setMotion(v);
+
+                        Vector3d v = new Vector3d(vehicle.getLookVec().x,vehicle.getLookVec().y,vehicle.getLookVec().z).scale(0.8f);
+                        vehicle.setMotion(v);
                     }
                     if(move==2)
                     {
-                        Vec3d v = new Vec3d(user.getRidingEntity().getLookVec().x,user.getRidingEntity().getLookVec().y,user.getRidingEntity().getLookVec().z).scale(0.8f).rotateYaw(-90);
-                        user.getRidingEntity().setMotion(v);
+                        vehicle.rotationYaw+=5;
+                        vehicle.rotationYawHead+=5;
+
                     }
                     if(move==1)
                     {
-                        Vec3d v = new Vec3d(user.getRidingEntity().getLookVec().x,user.getRidingEntity().getLookVec().y,user.getRidingEntity().getLookVec().z).scale(0.8f).rotateYaw(90);
-                        user.getRidingEntity().setMotion(v);
+                        vehicle.rotationYaw-=5;
+                        vehicle.rotationYawHead-=5;
                     }
                     if(move==3 && s==1)
                     {
-                        user.getRidingEntity().setMotion(0,1,0);
+                        vehicle.setMotion(0,1,0);
                     }
                     if(move==4 && s==1)
                     {
-                        user.getRidingEntity().setMotion(0,-1,0);
+                        vehicle.setMotion(0,-1,0);
 
                     }
                     if(move==5)
                     {
-                        BlockShipEntity entity = (BlockShipEntity) user.getRidingEntity();
-                        if(entity.getItemStackFromSlot(EquipmentSlotType.HEAD).getItem()== Items.STICK)
+                        if(vehicle.getItemStackFromSlot(EquipmentSlotType.HEAD).getItem()== Items.STICK)
                         {
-                            entity.setItemStackToSlot(EquipmentSlotType.HEAD, ItemStack.EMPTY);
+                            vehicle.setItemStackToSlot(EquipmentSlotType.HEAD, ItemStack.EMPTY);
                         }
                         else
                         {
-                            entity.setItemStackToSlot(EquipmentSlotType.HEAD,new ItemStack(Items.STICK));
+                            vehicle.setItemStackToSlot(EquipmentSlotType.HEAD,new ItemStack(Items.STICK));
                         }
 
                     }

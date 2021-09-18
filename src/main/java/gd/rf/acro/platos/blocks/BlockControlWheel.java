@@ -7,9 +7,13 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalBlock;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IClearable;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
@@ -25,11 +29,9 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class BlockControlWheel extends HorizontalBlock {
 
@@ -48,7 +50,7 @@ public class BlockControlWheel extends HorizontalBlock {
 
     @Override
     public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-        if(hand==Hand.MAIN_HAND && !world.isRemote)
+        if(!world.isRemote && hand==Hand.MAIN_HAND)
         {
             int balloons = Integer.parseInt(ConfigUtils.config.get("balloon"));
             int floats = Integer.parseInt(ConfigUtils.config.get("float"));
@@ -75,55 +77,65 @@ public class BlockControlWheel extends HorizontalBlock {
             {
                 Integer[] thisPos = filtered.get(0);
                 BlockPos gpos = pos.add(thisPos[0],thisPos[1],thisPos[2]);
-                for (int i = -2; i < 3; i++) {
-                    for (int j = -2; j < 3; j++) {
-                        for (int k = -2; k < 3; k++)
+                for (int i = -1; i < 2; i++) {
+                    for (int j = -1; j < 2; j++) {
+                        for (int k = -1; k < 2; k++)
                         {
-                            if(!world.getBlockState(gpos.add(i, j, k)).isAir() && !world.getBlockState(gpos.add(i, j, k)).getBlock().getTranslationKey().contains("ore") && world.getBlockState(gpos.add(i, j, k)).getFluidState().isEmpty())
+                            if(!world.getBlockState(gpos.add(i, j, k)).isAir()
+                                    && !world.getBlockState(gpos.add(i, j, k)).getBlock().getTranslationKey().contains("ore")
+                                    && world.getBlockState(gpos.add(i, j, k)).getBlock()!=Blocks.WATER
+                                    && world.getBlockState(gpos.add(i, j, k)).getBlock()!=Blocks.LAVA)
                             {
                                 if ((whitelist.equals("true") && PlatosTransporters.BOAT_MATERIAL.contains(world.getBlockState(gpos.add(i, j, k)).getBlock())
                                 ) || (whitelist.equals("false") && !PlatosTransporters.BOAT_MATERIAL_BLACKLIST.contains(world.getBlockState(gpos.add(i, j, k)).getBlock())))
                                 {
                                     Integer[] passable = new Integer[]{thisPos[0]+i,thisPos[1]+j,thisPos[2]+k};
-                                    if(i==0 && j==0 && k==0)
+                                    if (i != 0 || j != 0 || k != 0)
                                     {
-                                        //System.out.println("centre block skipping");
-                                    }
-                                    else if(filtered.stream().anyMatch(inside-> Arrays.equals(inside,passable)))
-                                    {
-
-                                        //System.out.println("already added, skipping");
-                                    }
-                                    else if(accepted.stream().anyMatch(inside-> Arrays.equals(inside,passable)))
-                                    {
-                                        //System.out.println("already accepted, skipping");
-                                    }
-                                    else
-                                    {
-                                        filtered.add(passable);
-                                        if(passable[0]>mposx)
-                                        {
-                                            mposx=passable[0];
+                                        boolean b = false;
+                                        for (Integer[] integers : filtered) {
+                                            if (Arrays.equals(integers, passable)) {
+                                                b = true;
+                                                break;
+                                            }
                                         }
-                                        if(passable[0]<nposx)
+                                        if(!b)
                                         {
-                                            nposx=passable[0];
-                                        }
-                                        if(passable[1]>mposy)
-                                        {
-                                            mposy=passable[1];
-                                        }
-                                        if(passable[1]<nposy)
-                                        {
-                                            nposy=passable[1];
-                                        }
-                                        if(passable[2]>mposz)
-                                        {
-                                            mposz=passable[2];
-                                        }
-                                        if(passable[2]<nposz)
-                                        {
-                                            nposz=passable[2];
+                                            boolean result = false;
+                                            for (Integer[] inside : accepted) {
+                                                if (Arrays.equals(inside, passable)) {
+                                                    result = true;
+                                                    break;
+                                                }
+                                            }
+                                            if(!result)
+                                            {
+                                                filtered.add(passable);
+                                                if(passable[0]>mposx)
+                                                {
+                                                    mposx=passable[0];
+                                                }
+                                                if(passable[0]<nposx)
+                                                {
+                                                    nposx=passable[0];
+                                                }
+                                                if(passable[1]>mposy)
+                                                {
+                                                    mposy=passable[1];
+                                                }
+                                                if(passable[1]<nposy)
+                                                {
+                                                    nposy=passable[1];
+                                                }
+                                                if(passable[2]>mposz)
+                                                {
+                                                    mposz=passable[2];
+                                                }
+                                                if(passable[2]<nposz)
+                                                {
+                                                    nposz=passable[2];
+                                                }
+                                            }
                                         }
                                     }
 
@@ -181,17 +193,17 @@ public class BlockControlWheel extends HorizontalBlock {
             System.out.println("balances: "+balances);
             if(type==-1)
             {
-                player.sendMessage(new StringTextComponent("No wheel/float/balloon found"));
+                player.sendMessage(new StringTextComponent("No wheel/float/balloon found"),UUID.randomUUID());
                 return ActionResultType.FAIL;
             }
             if(balances<blocks)
             {
-                player.sendMessage(new StringTextComponent("Cannot assemble, not enough floats/balloons/wheels"));
+                player.sendMessage(new StringTextComponent("Cannot assemble, not enough floats/balloons/wheels"),UUID.randomUUID());
                 used.keySet().forEach(key->
                 {
-                    player.sendMessage(new StringTextComponent(key+": "+used.get(key)));
+                    player.sendMessage(new StringTextComponent(key+": "+used.get(key)),UUID.randomUUID());
                 });
-                player.sendMessage(new StringTextComponent("If you believe any of the above blocks was added in error report it on CurseForge!"));
+                player.sendMessage(new StringTextComponent("If you believe any of the above blocks was added in error report it on CurseForge!"), UUID.randomUUID());
                 return ActionResultType.FAIL;
             }
             list.forEach(block->
@@ -205,7 +217,7 @@ public class BlockControlWheel extends HorizontalBlock {
                 world.setBlockState(pos.add(Integer.parseInt(vv[1]),Integer.parseInt(vv[2]),Integer.parseInt(vv[3])), Blocks.AIR.getDefaultState());
             });
 
-            BlockShipEntity entity = PlatosTransporters.BLOCK_SHIP_ENTITY_ENTITY_TYPE.create(world);
+            BlockShipEntity entity = PlatosTransporters.BLOCK_SHIP_ENTITY_ENTITY_TYPE.spawn((ServerWorld) world,null,null,player,player.getPosition(), SpawnReason.EVENT,false,false);
             int offset = 1;
             if(player.getHeldItem(hand).getItem()==PlatosTransporters.LIFT_JACK_ITEM)
             {
@@ -214,17 +226,16 @@ public class BlockControlWheel extends HorizontalBlock {
                     offset=player.getHeldItem(hand).getTag().getInt("off");
                 }
             }
-            world.addEntity(entity);
-            entity.setModel(list,getDirection(state),offset,type,storage,addons);
             if(type==1)
             {
                 entity.setNoGravity(true);
+                entity.setItemStackToSlot(EquipmentSlotType.HEAD, new ItemStack(Items.STICK));
             }
-            entity.teleportKeepLoaded(player.getPosX(),player.getPosY(),player.getPosZ());
+            entity.setModel(list,getDirection(state),offset,type,storage,addons);
             player.startRiding(entity, true);
-            return ActionResultType.SUCCESS;
+
         }
-        return ActionResultType.FAIL;
+        return super.onBlockActivated(state,world,pos,player,hand,hit);
     }
 
 

@@ -15,7 +15,6 @@ import net.minecraft.potion.Effects;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class ControlKeyItem extends Item {
@@ -30,7 +29,7 @@ public class ControlKeyItem extends Item {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity user, Hand p_77659_3_) {
-        if(user.getRidingEntity() instanceof BlockShipEntity && !p_77659_1_.isRemote)
+        if(user.getRidingEntity() instanceof BlockShipEntity)
         {
             CompoundNBT tag =((BlockShipEntity) user.getRidingEntity()).getItemStackFromSlot(EquipmentSlotType.CHEST).getTag();
             user.getRidingEntity().setMotion(user.getLookVec().x, user.getLookVec().y, user.getLookVec().z);
@@ -40,10 +39,15 @@ public class ControlKeyItem extends Item {
                 {
                     user.getRidingEntity().setNoGravity(false);
                     ((BlockShipEntity) user.getRidingEntity()).addPotionEffect(new EffectInstance(Effects.SLOW_FALLING, 9999, 2, true, false));
+
                 }
+
             }
         }
-        PlatosTransporters.givePlayerStartBook(user);
+        if(p_77659_1_.isRemote)
+        {
+            PlatosTransporters.givePlayerStartBook(user);
+        }
         return super.onItemRightClick(p_77659_1_, user, p_77659_3_);
     }
 }

@@ -49,7 +49,7 @@ public class LiftJackItem extends Item {
             }
             if(context.getHand()==Hand.MAIN_HAND)
             {
-                user.sendMessage(new StringTextComponent("new height: "+tag.getInt("off")));
+                user.sendMessage(new StringTextComponent("new height: "+tag.getInt("off")), UUID.randomUUID());
             }
             user.getHeldItem(hand).setTag(tag);
             PlatosTransporters.givePlayerStartBook(user);

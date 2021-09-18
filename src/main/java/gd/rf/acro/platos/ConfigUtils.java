@@ -67,6 +67,11 @@ public class ConfigUtils {
         defaults.add("#amount of blocks 1 wheel can lift (default: 10)");
         defaults.add("wheel=10");
 
+        defaults.add("#speed of vehicles on their correct terrain (default: 0.2)");
+        defaults.add("cspeed=0.2");
+        defaults.add("#speed of vehicles when not on their correct terrain (default: 0.05)");
+        defaults.add("nspeed=0.05");
+
         return defaults;
     }
 
