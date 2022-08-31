@@ -1,0 +1,34 @@
+{
+  "item.platos.control_key": "Chiave di Controllo",
+  "item.platos.wrench": "Chiave Inglese per Disassemblare",
+  "item.platos.lift_jack": "Scafo per Barca",
+  "item.platos.clearing_scythe": "Scopa",
+  "item.platos.boarding_stairs": "Scale di Bordo",
+
+  "block.platos.ship_controller": "Assemblatore Barca",
+  "block.platos.wheel_block": "Ruota",
+  "block.platos.float_block": "Gallegiante per Acqua",
+  "block.platos.balloon_block": "Palloni per Aerei",
+
+  "scythe.platos.tooltip": "Usa questo oggetto per togliere la sporcizia",
+  "liftjack.platos.tooltip":"Il player si siederà su questo blocco",
+  "liftjack.platos.tooltip2": "Sopra / Sotto il livello dell'Acqua",
+  "boardingstairs.platos.tooltip": "Punta in un mezzo distante per salirci",
+
+  "itemGroup.platos.tab": "Plato's Transporters",
+
+  "category.platos.main": "Plato's Transporters",
+
+  "key.platos.up": "Vola l'Aereo verso in alto",
+  "key.platos.down": "Vola l'Aereo verso in basso",
+  "key.platos.stop": "Blocca / Sblocca il cambio direnzione dell'Aereo",
+
+  "book.platos.page1": "Benvenuto/a platos transporters, questa mod è nelle sue prime versioni quindi ci potrebbero essere dei §lbug",
+  "book.platos.page2": "§lInziamo§r \n\Per inziare devi craftare un §oVolante§r e una §oChiave di Controllo§r dovrai craftare anche un §oScafo per Barca§r. Per creare il mezzo, è richiesto la corretta quantità di materiali: Scafo per Barca, Gallegiante per Acqua o Ruota/e se si vuole usarlo nel terreno",
+  "book.platos.page3": "1 Gallegiante per Acqua = 20 blocchi \n\n1 Ruota = 10 blocchi \n\n1 Palloniper per Aerei = 2 blocchi \n\n(questi sono configurabili) assemblano il tuo mezzo con materiali validi e piazza il volante",
+  "book.platos.page4": "Il Computer di Bordo ti dirà se ci sono sbagli o creerà il tuo veicolo. Di default il blocco il player si siede (difronte al Volante) sarà a un blocco di distanza, per cambiare questo, usa il Scafo per Barca",
+  "book.platos.page5": "Il Scafo per Barca può alzarsi e abbassarsi in base a dove siede il giocatore utilizzandolo o spostandolo (su un blocco) rispettivamente, per modificare l'altezza (elencata nella descrizione comando del Scafo per Barca) è possibile interagire con il Volante con il Scafo per Barca nella mano principale",
+  "book.platos.page6": "Una volta creato il mezzo ci sono alcuni controlli, per far avanzare in acqua acqua e in terra, si deve semplicemente premere i tasti per muoversi, mentre il mezzo viaggerà nella direzione in cui il giocatore sta guardando quando la Chiave di Controllo viene utilizzata",
+  "book.platos.page7": "Per disassemblare il mezzo usa la Chiave Inglese per Disassemblare, farà tornare i blocchi nella direzione in cui sono stati costruiti se c'è spazio"
+
+}
